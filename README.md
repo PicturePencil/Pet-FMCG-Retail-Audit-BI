@@ -575,7 +575,7 @@ Table containing sales&price indicators for each business and category and assem
 | cycle           | INTEGER     | d_cycles.id
 
 
-<a id="Measurements"></a>
+<a id="Formulas"></a>
 
 ## Report Indicators (Measurements)
 

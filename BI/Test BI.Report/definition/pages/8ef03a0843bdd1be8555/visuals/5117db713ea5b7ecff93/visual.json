@@ -1,0 +1,66 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "5117db713ea5b7ecff93",
+  "position": {
+    "x": 86.0790273556231,
+    "y": 105.04559270516717,
+    "z": 0,
+    "height": 300.54711246200606,
+    "width": 606.93009118541033
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "BlankTable"
+                        }
+                      },
+                      "Property": "Test"
+                    }
+                  },
+                  "Function": 3
+                }
+              },
+              "queryRef": "Min(BlankTable.Test)",
+              "nativeQueryRef": "Test",
+              "displayName": "Test"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "0acc46343a271537faa6",
+        "field": {
+          "Aggregation": {
+            "Expression": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "BlankTable"
+                  }
+                },
+                "Property": "Test"
+              }
+            },
+            "Function": 3
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

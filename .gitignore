@@ -1,0 +1,22 @@
+# secret data
+.env
+*.env
+!.env.example
+ 
+# Python
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+ 
+# Docker
+*.log
+ 
+# IDE
+.vscode/
+.idea/
+ 
+# OS
+.DS_Store
+Thumbs.db
+ 
