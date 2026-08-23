@@ -1,0 +1,23 @@
+table BlankTable
+	lineageTag: 5ba09fbd-87d3-44a6-8743-be36219d20b3
+
+	column Test
+		dataType: string
+		lineageTag: 272bb4aa-00be-4540-b6fb-94b81dc5a2bc
+		summarizeBy: none
+		sourceColumn: Test
+
+		annotation SummarizationSetBy = Automatic
+
+	partition BlankTable = m
+		mode: import
+		source =
+				let
+				  Источник = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WCkktLlGKjQUA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Test = _t])
+				in
+				  Источник
+
+	annotation PBI_NavigationStepName = Навигация
+
+	annotation PBI_ResultType = Table
+
