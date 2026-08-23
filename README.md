@@ -1,4 +1,33 @@
+<div style="
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    background-color: #20232a; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+    z-index: 9999; 
+    padding: 10px 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+">
+    <span style="color: #ffffff; font-weight: bold; margin-right: 10px;">Navigation:</span>
+    <a href="#Agenda" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">📌 Agenda</a>
+    <a href="#Workflows" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">⏳ Workflows</a>
+    <a href="#DB_structure" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">🧮 Databases</a>
+    <a href="#Calculating_reports" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">🗓 Calculating reports</a>
+    <a href="#Formulas" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">⚙️ Measurements</a>
+</div>
+
+<!-- Отступ, чтобы первый заголовок документа не спрятался ПОД панелью -->
+<br><br><br>
+
+<a id="Agenda"></a>
+
 # Pet BI FMСG Retail-Audit Analytics
+
 
 ## Agenda 
 ### Project aim  
@@ -10,15 +39,17 @@
 ### What platforms will be used
  DBMS - PostgreSQL
  BI platform - Power BI Desktop
- Python - for creating applications that imitatr collecting and verification processes
+ Python - for creating applications that imitade collecting and verification processes
 
 ### Analysing business categories
  Confectionery, Coffee, Infant Nutrition
- Each business have it's own dasboard due to the it's categories differences
- There is also will be a dashboard for cross-business analysys
+ Each business have it's own dashboard due to the it's categories differences
+ There is also will be a dashboard for cross-business analysis
 
-### Additional Analysys
+### Additional analysis
  Questionary time and efficiency, Agents KPI, Outlets performance
+
+<a id="Workflows"></a>
 
 ## Workflows
 
@@ -73,8 +104,9 @@ Workflow: *outlets -> audit_plan*
 Data collection will be conducted through surveys and audits of retail outlets. Two months prior to the first data collection cycle, each retail outlet will undergo an opening (baseline) audit. During this audit, a formal agreement will be signed with the store for the ongoing provision of stock and purchase data, and baseline (initial) figures on the store's stock levels and purchases will be collected.
 
 ### Verification process
-Collected and stored records will be spread to quality control or verification team members. During the process specialists will be checking raw data of visits. if there is some errors in data that can be changed by using picture or audio evidences QC specialist can add fixes to the raw data. If there is data that cannot be prooved through verification process QC can start questionable process to get from auditors more proofs or correct information about bad data. For this process auditor should update his questionable visit thgroug looking up store again. After getting new data or better evidences QC specialist can update or approve questionable data 
-If there is some critical errors in proofs, such as bad pictures, audio and mismatching between audio and pictures, or there are some cruitial violations of audit rules - QC can excalate the whole visit to rejection process and QC Lead must reject visit if it is confirmed
+Collected and stored records will be spread to quality control or verification team members. During the process specialists will be checking raw data of visits. if there is some errors in data that can be changed by using picture or audio evidences QC specialist can add fixes to the raw data. 
+<a id="questionable"></a>If there is data that cannot be prooved through verification process QC can start questionable process to get from auditors more proofs or correct information about bad data. For this process auditor should update his questionable visit through looking up store again. After getting new data or better evidences QC specialist can update or approve questionable data 
+<a id="escalated"></a>If there is some critical errors in proofs, such as bad pictures, audio and mismatching between audio and pictures, or there are some crucial violations of audit rules - QC can escalate the whole visit to rejection process and QC Lead must reject visit if it is confirmed
 The visit can be considered as fully verified if all of it records were checked and accepted/fixed except some SKU`s records which could be removed by QC team as exception. No escalated rejection or rejection included! 
 
 ### Analyze process
@@ -84,47 +116,54 @@ The analyze process consists of next parts:
     
     1.1. Analyst checks each outlet sales and handling dynamics, checks for statical outlier, trends, variances and deviations
     
-    1.2. Depending of results Analyst and manager come to an agreement for selecting suitable retail outlets for the final analysys maintaining quantitive quotas by outlet types in cities
+    1.2. Depending of results Analyst and manager come to an agreement for selecting suitable retail outlets for the final analysis maintaining quantitive quotas by outlet types in cities
 
 2. accembling reports
 
     2.1. Current cycle base sales calculation and adding it in base_sales table.
     The values calculating: current stocks, previous stocks, purchasing, facing, prices, unit sales and distribution parameters (Handling, Out of stock) 
 3. updating BI reports
+    3.1. Uploading data to power BI
+    3.2. Checking the colorcoding, graphics and table visuals. Crosschecking with database information
+    3.3. Publishing
 
 
 ### Closing the cycle
 When cycle is closed all visits, plans, verifications and other data should be locked for update and put to backup copy
+To close the cycle all audit plans should be finished, all visits checked by QC teams, all Questionable and Escalated to reject statuses on verification process have to be moved to Approved, Fixed or Rejected statuses.
+
+
+<a id="DB_structure"></a>
 
 ## DB structure
 ### Databases names and specifications
  #### Outlets & Questionary tables
  * [outlets](#outlets_table)
- * audit_plan
- * audit_data
- * raw_data
- * binary_links
+ * [audit_plan](#audit_plan)
+ * [audit_data](#audit_data)
+ * [raw_data](#)
+ * [binary_links](#audit_data)
  
  #### Verification
- * qc_tasks
- * qc_tasks_log
- * qc_verification
- * qc_evidence_items
+ * [qc_tasks](#qc_tasks)
+ * [qc_tasks_log](#qc_tasks_log)
+ * [qc_verification](#qc_verification)
+ * [qc_evidence_items](#qc_evidence_items)
 
  #### Teams
- * departments
- * roles
- * users
- * team_roaster
+ * [departments](#departments)
+ * [roles](#roles)
+ * [users](#users)
+ * [team_roaster](#team_roaster)
 
  #### Dictionaries
- * d_sku_info
- * d_sdc_info
- * d_cycles
+ * [d_sku_info](#d_sku_info)
+ * [d_sdc_info](#d_sdc_info)
+ * [d_cycles](#d_cycles)
  
  #### ENUM:
  
- * **t_cities** - *Andijan, Bukhara, Fergana, Samarkand, Tashkent, Total.* Total won`t be pickable for outlet reistration! Analysys only!  
+ * **t_cities** - *Andijan, Bukhara, Fergana, Samarkand, Tashkent, Total.* Total won`t be pickable for outlet reistration! analysis only!  
  * **t_outlet_types** - *Open Markets/Big Grocery/Small Grocery/Minimarket/Supermarket*
  * **t_outlet_activity** - *active/inactive*
  * **t_audit_status** - *Pending/In Progress/On Hold/Finished/Failed/Questionable*
@@ -147,17 +186,16 @@ When cycle is closed all visits, plans, verifications and other data should be l
  * **t_pack_category** - *mini/midi/maxi*
  * **t_price_categories** - *Economy/Mainstream/Premium*
 
-#### pre-analysys tables
-* outlet_quotes
-* outlet_picking
+#### pre-analysis tables
+* [outlet_quotes](#outlet_quotes)
+* [outlet_picking](#outlet_picking)
 
  #### Calculatable tables (Materialized View)
- * sales_base
- * business_report
- * master_sales
+ * [sales_base](#sales_base)
+ * [business_report](#business_report)
+ * [master_sales](#master_sales)
 
-#### Analyst (functional) tables
- * accepted_for_report
+
 
 ### Tables
 #### outlets <a id="outlets_table"></a>
@@ -179,7 +217,7 @@ Table with outlets registered for participating in FMCG retail-audit project.
 *We marking outlet status as 0 only when it is impossible to proceed current or future cycles audit or can`t rely on this outlet data  
 *Base cycle is used to show after which cycle audit data will be used for FMCG analysis
 
-#### audit_plan
+#### audit_plan <a id="audit_plan"></a>
 An upcoming audit tasks assigned by system or manager. 
 
 | Column names  | data type |  comment            |
@@ -200,7 +238,7 @@ Audit plan record status won't be finished until its last visit status wouldn`t 
 visits_plan is an orient value of visits and not constraint. It is used only as forecast
 Baseline audit created only when new outlet registered in system. If outlet registered when agent arrived at new outlet audit plan is created automatically with forecasted time. If outlet added by manager he must add parameters of planned time and visits count. 
 
-#### audit_data
+#### audit_data <a id="audit_data"></a>
 A list of visits in planned outlet. 
 1 row - 1 visit in 1 outlet.
 | Column names | data type |  comment            |
@@ -219,7 +257,7 @@ A list of visits in planned outlet.
 
 When a visit connected to the audit_plan.id marked as complete it`s audit plan status will be selected as Finished and this visit will be the last in cycle.
 
-#### raw_data
+#### raw_data <a id="raw_data"></a>
 Information about all SKU positions in an outlet taken from visits. 
 1 row - 1 SKU & 1 SDC unique combination each cycle visit
 
@@ -242,7 +280,7 @@ Information about all SKU positions in an outlet taken from visits.
 If there is an SKU with unregistered SDC or new unregistered SKU agent must request SKU registration from QC-team.
 *purchase value is the unit sku nubers purchased and distributed to the store from the last audit and before current visit  
 
-#### binary_links
+#### binary_links <a id="binary_links"></a>
 Links on binary (files) used as evidenses of audit performance
 
 | Column names  | data type  | comment            |
@@ -253,7 +291,7 @@ Links on binary (files) used as evidenses of audit performance
 |added_time     | TIMESTAMPTZ|
 
 
-#### qc_tasks 
+#### qc_tasks <a id="qc_tasks"></a>
 Each row - task to check 1 audit
 As the new vizit uploaded on server a record created with automate deadline. 
 A manager can change planned date
@@ -271,11 +309,9 @@ A manager can change planned date
 Finished status - all raw data was checked and approved (or fixed) without escalation to reject whole visit
 Only Approved by QC Team Lead visits will be taken to the FMCG analysis
 Task cannot get status Finished/Approved until all raw data of checked visit did not get accepted or fixed by QC specialist
-Questionable - when this status hits a visit - auditor must make another visit to gather more information about sku marked as questionable
 
 
-
-#### qc_tasks_log 
+#### qc_tasks_log <a id="qc_tasks_log"></a>
 Stores each changes of qc_tasks records or its creation such as planned time and status
 | Column names   | data type |   comment            |
 |----------------|-----------|----------------------|
@@ -289,7 +325,7 @@ Stores each changes of qc_tasks records or its creation such as planned time and
  
 Before rejection visit must be moved to status "Escalated reject" and then checked by QC Lead Manager. If there is possible to fix information by another visit a new visit task created. This status remains untill new data applied. After - goes to accepted or back to "in progress" status. 
 
-#### qc_verification
+#### qc_verification <a id="qc_verification"></a>
 SKU records verification table. 
 
 | Column names   | data type |  comment            |
@@ -306,11 +342,11 @@ SKU records verification table.
 
 QC agent can take a record to check. When he takes raw data from pending to check visit it changes qc_task status
 If SKU record has status Escalated to reject this could lead to reject the whole visit. This should trigger escalation in the qc_tasks and qc_tasks_log
-If SKU record is on marked to remove status it must be checked by the QC Lead manager and only then lead to the Remove status. Removed status just exclude row from FMCG analysys as insignificant or added as error. 
-Questionable - when this status hits an SKU, the parent task status must be marked as questionable. It also changes parent audit_plan status to Questionable and audit_data as incomplete. No updates of date and time. All Questionable moments will be checked throug qc_tasts_log. During the questionable change process auditor adds to excisting visits new audio and images about questionable SKU. Only after that he can do another visit if the last one (except questionable) was not final 
-If it is impossible to make acceptable evidences with collecting right data the whole audit porcess is rejected and we stop working with outlet 
+If SKU record is on marked to remove status it must be checked by the QC Lead manager and only then lead to the Remove status. Removed status just exclude row from FMCG analysis as insignificant or added as error. 
+Technical details for questionable Questionable: when this status hits an SKU, the parent task status must be marked as questionable. It also changes parent audit_plan status to Questionable and audit_data as incomplete. No updates of date and time. All Questionable moments will be checked throug qc_tasks_log. 
+If it is impossible to make acceptable evidences with collecting right data the whole audit process is rejected and we stop working with outlet 
 
-#### qc_evidence_items
+#### qc_evidence_items <a id="qc_evidence_items"></a>
 Table for liking between binary evidenses, raw data and audit visits
 | Column names   | data type | comment            |
 |----------------|-----------|--------------------|
@@ -321,10 +357,10 @@ Table for liking between binary evidenses, raw data and audit visits
 |raw_id (FK)     | BIGINT    | raw_data.id 
 |audit_id (FK)   | BIGINT    | audit_data.id 
 
-raw_id - for raw data evidence. NULL if evidnce for outlet and audit evidence (audit _id is not NULL)
+raw_id - for raw data evidence. NULL if evidence for outlet and audit evidence (audit _id is not NULL)
 audit_id - for outlet audit evidence (audio, pictures of store). NULL if raw_id is filled 
 
-#### departments
+#### departments <a id="departments"></a>
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
 |id  (PK)         | SERIAL    |           
@@ -334,7 +370,7 @@ audit_id - for outlet audit evidence (audio, pictures of store). NULL if raw_id 
 |is_active        | BOOLEAN   |
 
 
-#### roles
+#### roles <a id="roles"></a>
 
 Needed for individual access to reports or instruments
 
@@ -347,7 +383,7 @@ Needed for individual access to reports or instruments
 | is_active       | BOOLEAN   |
 | created_by      | BIGINT    | users.id    
 
-#### Users
+#### Users <a id="Users"></a>
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
 | id              | SERIAL    |
@@ -358,7 +394,7 @@ Needed for individual access to reports or instruments
 | gender          | t_gender  |
 
 
-#### team_roaster
+#### team_roaster <a id="team_roaster"></a>
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
 | id (PK)         | SERIAL    |
@@ -375,7 +411,7 @@ Needed for individual access to reports or instruments
 
 
  #### Dictionaries
- #### d_sku_info
+ #### d_sku_info <a id="d_sku_info"></a>
 SKU passport. Contains information that doesn`t change in long terms
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
@@ -390,7 +426,7 @@ SKU passport. Contains information that doesn`t change in long terms
 | company         | TYPE      | t_companies
 
 
-#### d_sdc_info
+#### d_sdc_info <a id="d_sdc_info"></a>
 Contains information about SKU`s slow dimensional changes
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
@@ -408,7 +444,7 @@ Contains information about SKU`s slow dimensional changes
 | price_segment   | TYPE      | t_price_categories (economy/mainstream/)
 
 
-#### d_cycles
+#### d_cycles <a id="d_cycles"></a>
 Contains information about cycles
 | Column names    | data type  | comment            |
 |-----------------|------------|--------------------|
@@ -421,11 +457,11 @@ Each cycle created automatically after finalizing last cycle
 Each cycle - 2 months
 Cycle starts from 1-st day of odd and last day of even month
 
-### pre-analysys tables
+### pre-analysis tables
 
 Important Note!
-The combination of cycle, SKU code, SDC code
-#### outlet_quotes
+The combination of cycle, SKU code, SDC code should be strictly unique
+#### outlet_quotes <a id="outlet_quotes"></a>
 Used to store information about strict quotes of outlet types in each city
 | Column names    | data type  | comment            |
 |-----------------|------------|--------------------|
@@ -435,8 +471,8 @@ Used to store information about strict quotes of outlet types in each city
 
 outlet_type & city combination must be unique
 
-#### outlet_picking
-This is used for picking outlets which audits were approved by QC Team for final analysys in selected cycle
+#### outlet_picking <a id="outlet_picking"></a>
+This is used for picking outlets which audits were approved by QC Team for final analysis in selected cycle
 | Column names    | data type  | comment            |
 |-----------------|------------|--------------------|
 |id (PK)          | SERIAL     |
@@ -454,23 +490,25 @@ Comment must be filled if "other" selected in approval or denial reason
 Only Lead Analyst and manager can pick/unpick outlets for final analysis. 
 When picked outlets hits quotes by city and outlet type other outlets in same city-type group must be selected as unpicked automatically
  
+<a id="Calculating_reports"></a>
+
 ### Calculatable tables (Materialized View)
 
-#### sales_base
+#### sales_base <a id="sales_base"></a>
 Table almost similar to raw_data, but it have sales and another additional rows
 It is calculatable and acceembles for business report when picking process id finished
 | Column names            | data type  | comment            |
 |-------------------------|------------|--------------------|
-| cycle                   | INTEGER    | d_cycles.id, comes from audit_plan.cycle
+| cycle                   | INTEGER    | d_cycles.id, comes from audit_data.cycle
 | cycle_name              | VARCHAR(14)| comes from d_cycles.cycle_name
-| sku_code  (FK)          | BIGINT     | sku_info.sku_id, comes from raw_data.sku_code
+| sku_code  (FK)          | BIGINT     | d_sku_info.sku_id, comes from raw_data.sku_code
 | full_name               | VARCHAR(90)| comes from d_sku_info.full_name
-| sdc_code (FK)           | BIGINT     | sdc_info.id, comes from raw_data.sdc_code
-| code_name               | VARCHAR(100)| comes from d_sdc_info.sdc_code_name
+| sdc_code (FK)           | BIGINT     | d_sdc_info.id, comes from raw_data.sdc_code
+| code_name               | VARCHAR(100)| comes from d_sdc_info.sku_code_name
 | city                    | t_cities   | from outlets.city
-| outlet_code  (FK)       | BIGINT     | outlets.outlet_code, comes from audit_plan.outlet
+| outlet_code  (FK)       | BIGINT     | outlets.outlet_code, comes from audit_data.outlet
 | business        | t_business_type|
-| category        | VARCHAR (20) | takes information from category column in d_sku_info
+| category        | VARCHAR (20) | takes information from category column in d_sdc_info
 | brand           | t_brands    |
 | company         | t_companies |
 | product_line    | t_product_lines |
@@ -491,7 +529,7 @@ Upon completion of the fieldwork and selection of the required retail outlets, t
 All data calculates from joined raw_data with qc_verification with corrections for right and approved information to collect current and previous numeric information of each visit. Then we join result table with qc_tasks, audit_data, qc_audit_plan, outlets, d_sku_info, d_sdc_info, outlet_picking, d_cycles. Аfter that the final table will be filtered by picked and approved information and appended to sales_base.
 The combination of outlet, sku, sdc codes, cycle and city values must be strictly unique!
 
-#### business_report
+#### business_report <a id="business_report"></a>
 Calculatable table assembled from sales_base
 Contains Nielsen calculations and shows business 
 | Column names    | data type  | comment            |
@@ -504,7 +542,7 @@ Contains Nielsen calculations and shows business
 | code_name       | VARCHAR(100)| NULL if measure_level <> "SKU"
 | city            | t_cities   | value "Total" will be added for all measure levels
 | business        | t_business_type|
-| category        | VARCHAR (20) | takes information from category column in d_sku_info
+| category        | VARCHAR (20) | takes information from category column in d_sdc_info
 | brand           | t_brands    |
 | company         | t_companies |
 | product_line    | t_product_lines |
@@ -525,17 +563,20 @@ The levels of measurements:
 
 An important note! Each calculation of new cycle should be appended, no recalculation of this table except cases when it`s necessary!
 
-#### master_sales
+#### master_sales <a id="master_sales"></a>
 Table containing sales&price indicators for each business and category and assembled on the level structure which is explained under the table
 | Column names    | data type   | comment            |
 |-----------------|-------------|--------------------|
-| business_lvl    | VARCHAR (30)| The higher level with business names. Incudes "Total" for cross business analysys. It is intended to add this columnt to power BI matrix in the rows field.
+| business_lvl    | VARCHAR (30)| The higher level with business names. Incudes "Total" for cross business analysis. It is intended to add this columnt to power BI matrix in the rows field.
 | lvl_01_category | VARCHAR (30)| All categories inside the business + total for intercategorial analysis
 | lvl_02_price_segment| VARCHAR (30)| All price segments + total for intersegmentional analysis
 | lvl_03_companies| t_companies | All companies
 | volume          | INTEGER     | sales volume in tons
 | value           | BIGINT      | sales value in MLN UZS
-| cycle           | d_cycles    | 
+| cycle           | INTEGER     | d_cycles.id
+
+
+<a id="Measurements"></a>
 
 ## Report Indicators (Measurements)
 
@@ -595,7 +636,7 @@ $Weighted$ $OOS$ =  $\frac{OOSV}{TSV}$
 
 **TSV** - Total Sales volume of Business/Category Handlers (for total distribution, distribution inside category)  
 
-* **First Freauent Price** - Most Frequent Price of SKU
+* **First Frequent Price** - Most Frequent Price of SKU
 * **Price Per gram** - Average Price for the gram of SKU/Brand
 
 <div align="center"> 
@@ -611,7 +652,7 @@ SVol - Sales Volume of SKU\Brand
 
 <div align="center"> 
 
-$PPG$ =  $\frac{SVal}{US}$
+$PPI$ =  $\frac{SVal}{US}$
 
 </div>
 
@@ -619,7 +660,7 @@ $PPG$ =  $\frac{SVal}{US}$
 
 <div align="center"> 
 
-$PPG$ =  $\frac{Facing}{US}$
+$Facing$ $Share$ =  $\frac{Facing}{US}$
 
 </div>
 
