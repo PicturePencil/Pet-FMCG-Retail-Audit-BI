@@ -343,7 +343,7 @@ SKU records verification table.
 QC agent can take a record to check. When he takes raw data from pending to check visit it changes qc_task status
 If SKU record has status Escalated to reject this could lead to reject the whole visit. This should trigger escalation in the qc_tasks and qc_tasks_log
 If SKU record is on marked to remove status it must be checked by the QC Lead manager and only then lead to the Remove status. Removed status just exclude row from FMCG analysis as insignificant or added as error. 
-Technical details for questionable Questionable: when this status hits an SKU, the parent task status must be marked as questionable. It also changes parent audit_plan status to Questionable and audit_data as incomplete. No updates of date and time. All Questionable moments will be checked throug qc_tasks_log. 
+Technical details for Questionable: when this status hits an SKU, the parent task status must be marked as questionable. It also changes parent audit_plan status to Questionable and audit_data as incomplete. No updates of date and time. All Questionable moments will be checked throug qc_tasks_log. 
 If it is impossible to make acceptable evidences with collecting right data the whole audit process is rejected and we stop working with outlet 
 
 #### qc_evidence_items <a id="qc_evidence_items"></a>
