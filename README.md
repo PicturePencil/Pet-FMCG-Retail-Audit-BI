@@ -105,7 +105,7 @@ Data collection will be conducted through surveys and audits of retail outlets. 
 
 ### Verification process
 Collected and stored records will be spread to quality control or verification team members. During the process specialists will be checking raw data of visits. if there is some errors in data that can be changed by using picture or audio evidences QC specialist can add fixes to the raw data. 
-<a id="questionable"></a>If there is data that cannot be prooved through verification process QC can start questionable process to get from auditors more proofs or correct information about bad data. For this process auditor should update his questionable visit through looking up store again. After getting new data or better evidences QC specialist can update or approve questionable data 
+If there is data that cannot be prooved through verification process QC can start questionable process to get from auditors more proofs or correct information about bad data. For this process auditor should update his questionable visit through looking up store again. After getting new data or better evidences QC specialist can update or approve questionable data 
 <a id="escalated"></a>If there is some critical errors in proofs, such as bad pictures, audio and mismatching between audio and pictures, or there are some crucial violations of audit rules - QC can escalate the whole visit to rejection process and QC Lead must reject visit if it is confirmed
 The visit can be considered as fully verified if all of it records were checked and accepted/fixed except some SKU`s records which could be removed by QC team as exception. No escalated rejection or rejection included! 
 
@@ -125,7 +125,6 @@ The analyze process consists of next parts:
 3. updating BI reports
     3.1. Uploading data to power BI
     3.2. Checking the colorcoding, graphics and table visuals. Crosschecking with database information
-    3.3. Publishing
 
 
 ### Closing the cycle
@@ -343,7 +342,7 @@ SKU records verification table.
 QC agent can take a record to check. When he takes raw data from pending to check visit it changes qc_task status
 If SKU record has status Escalated to reject this could lead to reject the whole visit. This should trigger escalation in the qc_tasks and qc_tasks_log
 If SKU record is on marked to remove status it must be checked by the QC Lead manager and only then lead to the Remove status. Removed status just exclude row from FMCG analysis as insignificant or added as error. 
-Technical details for questionable Questionable: when this status hits an SKU, the parent task status must be marked as questionable. It also changes parent audit_plan status to Questionable and audit_data as incomplete. No updates of date and time. All Questionable moments will be checked throug qc_tasks_log. 
+Technical details for Questionable: when this status hits an SKU, the parent task status must be marked as questionable. It also changes parent audit_plan status to Questionable and audit_data as incomplete. No updates of date and time. All Questionable moments will be checked throug qc_tasks_log. 
 If it is impossible to make acceptable evidences with collecting right data the whole audit process is rejected and we stop working with outlet 
 
 #### qc_evidence_items <a id="qc_evidence_items"></a>
@@ -526,7 +525,7 @@ It is calculatable and acceembles for business report when picking process id fi
 | is_out_of_stock         | BOOLEAN    | TRUE if there is no units in current stock because everything was sold
 
 Upon completion of the fieldwork and selection of the required retail outlets, the cycle calculations are performed and appended to the table
-All data calculates from joined raw_data with qc_verification with corrections for right and approved information to collect current and previous numeric information of each visit. Then we join result table with qc_tasks, audit_data, qc_audit_plan, outlets, d_sku_info, d_sdc_info, outlet_picking, d_cycles. Аfter that the final table will be filtered by picked and approved information and appended to sales_base.
+All data calculates from joined raw_data with qc_verification with corrections for right and approved information to collect current and previous numeric information of each visit. Then we join result table with qc_tasks, audit_data, qc_audit_plan, outlets, d_sku_info, d_sdc_info, outlet_picking, d_cycles. Аfter that the final table will be filtered by picked and approved information and appended to sales_base. Audit_plan joined as safety filter, in case a visit's qc_tasks got Approved while the parent audit_plan somehow remains not Finished
 The combination of outlet, sku, sdc codes, cycle and city values must be strictly unique!
 
 #### business_report <a id="business_report"></a>
