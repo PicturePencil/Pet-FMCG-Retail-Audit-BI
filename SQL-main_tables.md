@@ -445,3 +445,100 @@ CREATE TABLE binary_links (
 );
 ```
 
+## Stage 5 - Quality Control tables
+``` sql
+--Audit check tasks
+CREATE TABLE qc_tasks (
+    id SERIAL PRIMARY KEY,
+    audit_id BIGINT NOT NULL,
+    created_time TIMESTAMPTZ NOT NULL,
+    start_time TIMESTAMPTZ NOT NULL,
+    assigned_by BIGINT NOT NULL,
+    task_status t_task_status NOT NULL,
+
+    CONSTRAINT fk_audit
+        FOREIGN KEY (audit_it)
+        REFERENCES audit_data (id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_assignee
+        FOREIGN KEY (assigned_by)
+        REFERENCES users (id)
+        ON DELETE RESTRICT
+);
+
+--verification status log
+CREATE TABLE qc_tasks_log (
+    id SERIAL PRIMARY KEY,
+    task_id BIGINT NOT NULL,
+    modified_by BIGINT NOT NULL.
+    mofified_time TIMESTAMPTZ NOT NULL,
+    start_time_new TIMESTAMPTZ NOT NULL,
+    end_time_nem TIMESTAMPTZ,
+    task_status_new t_task_status NOT NULL,
+
+    CONSTRAINT fk_modified 
+        FOREIGN KEY (modified_by)
+        REFERENCES users (id)
+        ON DELETE RESTRICT
+);
+
+--raw data with check status
+CREATE TABLE qc_verification (
+    id SERIAL PRIMARY KEY,
+    assign_id BIGINT NOT NULL,
+    verified_by BIGINT NOT NULL,
+    started_time TIMESTAMPTZ NOT NULL,
+    applied_time TIMESTAMPTZ,
+    pos_id BIGINT NOT NULL,
+    verification_status t_verification_status,
+    columns_change jsonb,
+    comments TEXT,
+
+    CONSTRAINT fk_task
+        FOREIGN KEY (assign_id)
+        REFERENCES qc_tasks (id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_verified
+        FOREIGN KEY (verified_by)
+        REFERENCES users (id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_raw
+        FOREIGN KEY (pos_id)
+        REFERENCES raw_data (id)
+        ON DELETE RESTRICT
+);
+
+--evidences
+CREATE TABLE qc_evidence_items (
+    id SERIAL PRIMARY KEY,
+    binary_id BIGINT NOT NULL,
+    assigned_by BIGINT NOT NULL,
+    assigned_date TIMESTAMPTZ NOT NULL,
+    raw_id BIGINT,
+    audit_id BIGINT,
+
+    CONSTRAINT fk_binary
+        FOREIGN KEY (binary_id)
+        REFERENCES binary_links (id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_assigned
+        FOREIGN KEY (assigned_by)
+        REFERENCES users (id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_raw
+        FOREIGN KEY (raw_id)
+        REFERENCES raw_data (id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT fk_audit
+        FOREIGN KEY (audit_id)
+        REFERENCES audit_data (id)
+        ON DELETE RESTRICT
+);
+
+```
