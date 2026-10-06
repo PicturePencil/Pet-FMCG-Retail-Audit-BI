@@ -18,7 +18,7 @@
     <a href="#Workflows" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">⏳ Workflows</a>
     <a href="#DB_structure" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">🧮 Databases</a>
     <a href="#Calculating_reports" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">🗓 Calculating reports</a>
-    <a href="#Formulas" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">⚙️ Measurements</a>
+    <a href="#Formulas" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">⚙️ Measurements</a><a href="ROADMAP.md" style="color: #61dafb; text-decoration: none; font-size: 14px; font-weight: 500;">🛣 Roadmap</a>
 </div>
 
 <!-- Отступ, чтобы первый заголовок документа не спрятался ПОД панелью -->
@@ -47,13 +47,13 @@
  There is also will be a dashboard for cross-business analysis
 
 ### Additional analysis
- Questionary time and efficiency, Agents KPI, Outlets performance
+ Questionnaire time and efficiency, Agents KPI, Outlets performance
 
 <a id="Workflows"></a>
 
 ## Workflows
 
-### Base Workflow:
+### Base Workflow (Collection):
 When adding new outlets to base
 *Finding outlets -> Register outlet -> Making base audit -> Verification process -> planning next audit*
 
@@ -67,7 +67,7 @@ When collecting data for cycle analysis
 
 Workflow: *Outlets -> audit_plan*
 
-**Base audit** - collecting data of SKU stocks and other information. During the process agent can request new SKU/SDC registration.
+**Base audit** - collecting data of SKU stocks and other information. During the process agent can request new SKU/SCD registration.
 
 Workflow: *audit_plan -> audit_data -> raw_data*
 
@@ -136,7 +136,7 @@ To close the cycle all audit plans should be finished, all visits checked by QC 
 
 ## DB structure
 ### Databases names and specifications
- #### Outlets & Questionary tables
+ #### Outlets & Questionnaire tables
  * [outlets](#outlets_table)
  * [audit_plan](#audit_plan)
  * [audit_data](#audit_data)
@@ -157,7 +157,10 @@ To close the cycle all audit plans should be finished, all visits checked by QC 
 
  #### Dictionaries
  * [d_sku_info](#d_sku_info)
- * [d_sdc_info](#d_sdc_info)
+ * [d_scd_info](#d_scd_info)
+ * [d_companies](#companies)
+ * [d_brandnames](#brands)
+ * [d_brand_lines](#brandlines)
  * [d_cycles](#d_cycles)
  
  #### ENUM:
@@ -177,9 +180,6 @@ To close the cycle all audit plans should be finished, all visits checked by QC 
  * **t_decline_reason** - *non-representative/quota_exceeded/repeated_qc_failure/duplicate_coverage/other reason*
  * **t_business_type** - *Coffee/Confectionery/Infant Nutrition*
  * **t_measure_level** - *SKU/Brand/Company*
- * **t_brands** - list of brands
- * **t_companies** - list of companies
- * **t_product_lines** - list of product lines
  * **t_categories** - categorises for each business. Tablets, Bars, Pure Soluble, Infant Cereal and others
  * **t_packages** - *can, dough pack, glass, carton*
  * **t_pack_category** - *mini/midi/maxi*
@@ -202,13 +202,15 @@ Table with outlets registered for participating in FMCG retail-audit project.
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
 |outlet_code (PK) | SERIAL    | 
-|registered date  | DATE      |
+|registered date  | TIMESTAMPTZ|
 |base_cycle (FK)  | INTEGER   | d_cycles.id
 |city             | t_cities  | 
-|location         | GEOGRAPHY |
+|outlet_location  | GEOGRAPHY |
 |adress           | VARCHAR(255)|         
-|owner_name       | VARCHAR(255)|      
-|type             | t_outlet_types|
+|owner_name       | VARCHAR(255)|
+|owner_phone1     | VARCHAR(12) | For 1 country only (12 digits for Uzbekistan)      
+|owner_phone2     | VARCHAR(12) | For 1 country only (12 digits for Uzbekistan)  
+|outlet_type             | t_outlet_types|
 |outlet_status    | t_outlet_activity |  active/inactive
 |comments         | VARCHAR(255)|
 
@@ -227,7 +229,7 @@ An upcoming audit tasks assigned by system or manager.
 |start_time_plan| TIMESTAMPTZ  |
 |end_time_plan  | TIMESTAMPTZ  |
 |visits_plan    | SMALLINT  | count of Visits planned
-|assigned_for (FK) | BIGINT | Assigned agent for questionary (users.id)
+|assigned_for (FK) | BIGINT | Assigned agent for questionnaire (users.id)
 |assigned_by (FK)| BIGINT   | Assigned by user (users.id)
 |assigned_time  | TIMESTAMPTZ  |
 |assign_type    |t_audit_type|Regular audit/Baseline Audit
@@ -248,7 +250,7 @@ A list of visits in planned outlet.
 |visit_sequence| INTEGER   | starts from 1 each cycle for each outlet
 |start_time    | TIMESTAMPTZ  |
 |end_time      | TIMESTAMPTZ  |
-|status        | BOOLEAN   | 0 - incomplete, 1 - complete
+|audit_status  | BOOLEAN   | 0 - incomplete, 1 - complete
 |next_audit_needed| BOOLEAN| 0 - no (always if status = 1), 1 - yes,
 |next_cycle_audit| BOOLEAN | 0 - no (we stop working with outlet), 1 - yes
 |agent_comment |VARCHAR(255)|
@@ -258,14 +260,14 @@ When a visit connected to the audit_plan.id marked as complete it`s audit plan s
 
 #### raw_data <a id="raw_data"></a>
 Information about all SKU positions in an outlet taken from visits. 
-1 row - 1 SKU & 1 SDC unique combination each cycle visit
+1 row - 1 SKU & 1 SCD unique combination each cycle visit
 
 | Column names  | data type | comment            |
 |---------------|-----------|--------------------|
 |id  (PK)       | SERIAL    |
 |audit_id (FK)  | BIGINT    | audit_data.id
 |sku_code (FK)  | BIGINT    | d_sku_info.id
-|sdc_code (FK)  | BIGINT    | d_sdc_info.id    
+|scd_code (FK)  | BIGINT    | d_scd_info.id    
 |price          | INTEGER   |
 |shelf_stock    | INTEGER   | units only, not volume
 |warehouse_stock| INTEGER   | units only, not volume
@@ -276,7 +278,7 @@ Information about all SKU positions in an outlet taken from visits.
 |will_distribute| BOOLEAN   |
 |comment        | VARCHAR(255)|
 
-If there is an SKU with unregistered SDC or new unregistered SKU agent must request SKU registration from QC-team.
+If there is an SKU with unregistered SCD or new unregistered SKU agent must request SKU registration from QC-team and approved by QC manager.
 *purchase value is the unit sku nubers purchased and distributed to the store from the last audit and before current visit  
 
 #### binary_links <a id="binary_links"></a>
@@ -365,7 +367,7 @@ audit_id - for outlet audit evidence (audio, pictures of store). NULL if raw_id 
 |id  (PK)         | SERIAL    |           
 |team_name        | VARCHAR(20)|
 |registration_date| TIMESTAMPTZ|
-|registered_by    | BIGINT    |
+|registered_by(FK)| BIGINT    | users.id
 |is_active        | BOOLEAN   |
 
 
@@ -376,19 +378,19 @@ Needed for individual access to reports or instruments
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
 | role_id (PK)    | SERIAL    |
-| role_name       | VARCHAR(20)| Agent / Supervisor / QC Specialist / QC Lead / QC Manager / Project owner / Analyst / ... etc
+| role_name       | VARCHAR(20)| Agent / Supervisor / QC Specialist / QC Lead / QC Manager / Project manager / Analyst / ... etc
 | created_time    | TIMESTAMPTZ  |
 | valid_to_date   | TIMESTAMPTZ  |
 | is_active       | BOOLEAN   |
 | created_by      | BIGINT    | users.id    
 
-#### Users <a id="Users"></a>
+#### users <a id="users"></a>
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
 | id              | SERIAL    |
 | first_name      | VARCHAR(30)|
 | second_name     | VARCHAR(30)|
-| regster_date    | TIMESTAMPTZ  |
+| register_date    | TIMESTAMPTZ  |
 | created_by      | BIGINT    | Users.id
 | gender          | t_gender  |
 
@@ -417,31 +419,64 @@ SKU passport. Contains information that doesn`t change in long terms
 | sku_id (PK)     | SERIAL    |
 | created_time    | TIMESTAMPTZ  | 
 | added_by        | BIGINT    | users.id
+| approved_by     | BIGINT    | users.id
 | is_active       | BOOLEAN   |
 | short_name      | VARCHAR(30)|
 | full_name       | VARCHAR(90)|
 | business        | t_business_type| Coffee, Confectionery, Infant Nutrition
-| brand           | TYPE      | t_brands
-| company         | TYPE      | t_companies
+| brand           | INTEGER    | d_brandnames.id
 
 
-#### d_sdc_info <a id="d_sdc_info"></a>
+
+#### d_scd_info <a id="d_scd_info"></a>
 Contains information about SKU`s slow dimensional changes
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
 | id (PK)         | SERIAL    |
 | sku_id (FK)     | BIGINT    |
 | created_time    | TIMESTAMPTZ |
+| added_by        | BIGINT    | users.id
+| approved_by     | BIGINT    | users.id
 | valid_from_cycle| INTEGER   |
 | valid_to_cycle  | INTEGER   |
 | sku_code_name   | VARCHAR(100)| include brand, sku name or line, package parameter, volume in grams
-| product_line    | TYPE      | t_product_lines
+| product_line    | INTEGER   | d_brand_lines.id
 | category        | TYPE      | t_categories
-| pack_volume     | SMALLINT  | weight in grams 
+| pack_volume     | INTEGER   | weight in grams 
 | package         | TYPE      | t_packages (can, dough pack, etc)
 | pack_category   | TYPE      | t_pack_category (mini/midi/maxi)
 | price_segment   | TYPE      | t_price_categories (economy/mainstream/)
 
+
+#### d_companies <a id="companies"></a>
+Contains information about SKU`s slow dimensional changes
+| Column names    | data type | comment            |
+|-----------------|-----------|--------------------|
+| id (PK)         | SERIAL    |
+| company_name    | VARCHAR(30)|
+| added_by (FK)   | BIGINT    | users.id
+| added_date      | TIMESTAMPTZ|
+
+
+#### d_brandnames <a id="brands"></a>
+Contains information about SKU`s slow dimensional changes
+| Column names    | data type | comment            |
+|-----------------|-----------|--------------------|
+| id (PK)         | SERIAL    |
+| brand_name      | VARCHAR(30)|
+| added_by (FK)   | BIGINT    | users.id
+| added_date      | TIMESTAMPTZ|
+| referred_company (FK)| INTEGER|d_companies.id
+
+#### d_brand_lines <a id="brandlines"></a>
+Contains information about SKU`s slow dimensional changes
+| Column names    | data type | comment            |
+|-----------------|-----------|--------------------|
+| id (PK)         | SERIAL    |
+| brand_line      | VARCHAR(30)|
+| added_by (FK)   | BIGINT    | users.id
+| added_date      | TIMESTAMPTZ|
+| referred_brand (FK)| INTEGER|d_brand_lines.id
 
 #### d_cycles <a id="d_cycles"></a>
 Contains information about cycles
@@ -459,7 +494,7 @@ Cycle starts from 1-st day of odd and last day of even month
 ### pre-analysis tables
 
 Important Note!
-The combination of cycle, SKU code, SDC code should be strictly unique
+The combination of cycle, SKU code, SCD code should be strictly unique
 #### outlet_quotes <a id="outlet_quotes"></a>
 Used to store information about strict quotes of outlet types in each city
 | Column names    | data type  | comment            |
@@ -502,15 +537,15 @@ It is calculatable and acceembles for business report when picking process id fi
 | cycle_name              | VARCHAR(14)| comes from d_cycles.cycle_name
 | sku_code  (FK)          | BIGINT     | d_sku_info.sku_id, comes from raw_data.sku_code
 | full_name               | VARCHAR(90)| comes from d_sku_info.full_name
-| sdc_code (FK)           | BIGINT     | d_sdc_info.id, comes from raw_data.sdc_code
-| code_name               | VARCHAR(100)| comes from d_sdc_info.sku_code_name
+| scd_code (FK)           | BIGINT     | d_scd_info.id, comes from raw_data.scd_code
+| code_name               | VARCHAR(100)| comes from d_scd_info.sku_code_name
 | city                    | t_cities   | from outlets.city
 | outlet_code  (FK)       | BIGINT     | outlets.outlet_code, comes from audit_data.outlet
 | business        | t_business_type|
-| category        | VARCHAR (20) | takes information from category column in d_sdc_info
-| brand           | t_brands    |
-| company         | t_companies |
-| product_line    | t_product_lines |
+| category        | VARCHAR (20) | takes information from category column in d_scd_info
+| brand  (FK)     | INTEGER    | d_brandnames.id
+| company (FK)    | INTEGER    | d_companies.id
+| product_line    | INTEGER    | d_brand_lines.id
 | current_shelf_stocks    | INTEGER    | calculated from raw_data.shelf_stocks
 | previous_shelf_stocks   | INTGER     | calculated from raw_data.shelf_stocks in previous cycle
 | current_warehouse_stocks| INTEGER    | calculated from raw_data.warehouse_stocks
@@ -525,8 +560,8 @@ It is calculatable and acceembles for business report when picking process id fi
 | is_out_of_stock         | BOOLEAN    | TRUE if there is no units in current stock because everything was sold
 
 Upon completion of the fieldwork and selection of the required retail outlets, the cycle calculations are performed and appended to the table
-All data calculates from joined raw_data with qc_verification with corrections for right and approved information to collect current and previous numeric information of each visit. Then we join result table with qc_tasks, audit_data, qc_audit_plan, outlets, d_sku_info, d_sdc_info, outlet_picking, d_cycles. Аfter that the final table will be filtered by picked and approved information and appended to sales_base. Audit_plan joined as safety filter, in case a visit's qc_tasks got Approved while the parent audit_plan somehow remains not Finished
-The combination of outlet, sku, sdc codes, cycle and city values must be strictly unique!
+All data calculates from joined raw_data with qc_verification with corrections for right and approved information to collect current and previous numeric information of each visit. Then we join result table with qc_tasks, audit_data, qc_audit_plan, outlets, d_sku_info, d_scd_info, outlet_picking, d_cycles. Аfter that the final table will be filtered by picked and approved information and appended to sales_base. Audit_plan joined as safety filter, in case a visit's qc_tasks got Approved while the parent audit_plan somehow remains not Finished
+The combination of outlet, sku, scd codes, cycle and city values must be strictly unique!
 
 #### business_report <a id="business_report"></a>
 Calculatable table assembled from sales_base
@@ -537,14 +572,14 @@ Contains Nielsen calculations and shows business
 | cycle_name      | VARCHAR(14)| 
 | sku_code  (FK)  | BIGINT     | NULL if measure_level <> "SKU" 
 | full_name       | VARCHAR(90)| For Each measure level: SKU Name/Brand name/Company Name/Category Name/Price Segment
-| sdc_code (FK)   | BIGINT     | NULL if measure_level <> "SKU"
+| scd_code (FK)   | BIGINT     | NULL if measure_level <> "SKU"
 | code_name       | VARCHAR(100)| NULL if measure_level <> "SKU"
 | city            | t_cities   | value "Total" will be added for all measure levels
 | business        | t_business_type|
-| category        | VARCHAR (20) | takes information from category column in d_sdc_info
-| brand           | t_brands    |
-| company         | t_companies |
-| product_line    | t_product_lines |
+| category        | VARCHAR (20) | takes information from category column in d_scd_info
+| brand  (FK)     | INTEGER    | d_brandnames.id
+| company (FK)    | INTEGER    | d_companies.id
+| product_line    | INTEGER    | d_brand_lines.id
 | price_segment   | VARCHAR (20)|
 | age_segment     | VARCHAR (20)|
 | package         | VARCHAR (20)|
@@ -584,10 +619,10 @@ Table containing sales&price indicators for each business and category and assem
  * **Sales value in mln UZS** - summarized value of all sold SKU  
  $$\sum_{i,k}^{n, m} (US*Price)_i$$
 
-Where **i** - Outlet code, **k** - SKU & SDC code combination
+Where **i** - Outlet code, **k** - SKU & SCD code combination
 * **Sales volume, in tons** - volume of sold SKU in tons.
  $$\sum_{i,k}^{n, m} (US * v)_i$$
- Where **v** is sdc_volume
+ Where **v** is scd_volume
 
  * **Value/Volume Share** - the share of sales by SKU/Company/Brand etc. Calculates in each area level (Total market, Business, City, Category, etc)
 
@@ -668,7 +703,7 @@ $Facing$ $Share$ =  $\frac{Facing}{US}$
 ### SQL scrits
 All SQL scripts is extracted in separate files:
 
-* Creating tables in database
+* [Set up database and create main tables for collecting and approval](SQL-main_tables.md)
 * Creating reports
 * Adding new information (python)
 * Calculating and appending new cycle data (python & SQL)
