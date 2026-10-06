@@ -68,3 +68,22 @@ The interface depends of role and be downloaded from API each authorisation.
 > - ⚪️ **Step 5:** Generating master sales and sales report for new cycle
 > - ⚪️ **Step 6:** Sales report Power BI dashboard (.pbip)  
 > - ⚪️ **Step 7:** Master sales Power BI dashboard (.pbip)
+
+
+<a href="javascript:history.back()" style="
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    background-color: #007bff;
+    color: #ffffff !important;
+    padding: 12px 18px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: background-color 0.3s;
+" onmouseover="this.style.backgroundColor='#0056b3'" onmouseout="this.style.backgroundColor='#007bff'">
+    ← Back
+</a>
