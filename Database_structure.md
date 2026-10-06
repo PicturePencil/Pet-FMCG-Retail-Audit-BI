@@ -565,4 +565,3 @@ $PPI$ =  $\frac{SVal}{US}$
 $Facing$ $Share$ =  $\frac{Facing}{US}$
 
 </div>
-
