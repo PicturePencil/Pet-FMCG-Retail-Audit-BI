@@ -11,7 +11,8 @@ CREATE TYPE t_cities AS ENUM (
 CREATE TYPE t_outlets_type as ENUM (
     'Open Markets', 'Big Grocery', 'Small Grocery', 'Minimarket','Supermarket'
 );
-CREATE TYPE t_outlet_activity as  ('Active', 'Inactive')
+CREATE TYPE t_outlet_activity as ENUM ('Active', 'Inactive');
+CREATE TYPE t_outlet_types as ENUM ('Open Market', 'Pavillions an Bus stops', 'Big Grocery', 'Small Grocery', 'Minimarket', 'Supermarket')
 CREATE TYPE t_audit_status as ENUM (
     'Pending', 'In Progress', 'On Hold', 'Finished', 'Failed', 'Questionable'
     );
@@ -62,7 +63,7 @@ CREATE TYPE t_price_categories as ENUM (
 );
 --Creating cycles table
 CREATE TABLE d_cycles (
-    id SERIAL RPIMARY KEY,
+    id SERIAL PRIMARY KEY,
     cycle_name VARCHAR(14) NOT NULL UNIQUE,
     starts_from DATE NOT NULL UNIQUE,
     ends_in DATE NOT NULL UNIQUE
@@ -76,7 +77,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     second_name VARCHAR(30) NOT NULL,
-    register_date TIMESTAMPZ NOT NULL,
+    register_date TIMESTAMPTZ NOT NULL,
     created_by BIGINT,
     gender t_gender NOT NULL,
 
@@ -87,8 +88,28 @@ CREATE TABLE users (
         ON DELETE SET NULL
 );
 --and then creating first user as grand admin
-INSERT INTO users (first_name, second_name, register_date, created_by gender) 
+INSERT INTO users (first_name, second_name, register_date, created_by, gender) 
 VALUES ('GRAND', 'ADMIN', NOW(), NULL, 'O');
+--now we need to add passwords table 
+--first adding extention for to hash passwords
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+--then creating passwords table
+CREATE TABLE passwords (
+    user_id BIGINT NOT NULL,
+    password_hash VARCHAR(60) NOT NULL,
+    is_current BOOLEAN NOT NULL,
+    created_time TIMESTAMPTZ NOT NULL,
+    changed_time TIMESTAMPTZ,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+        REFERENCES users (id)
+        ON DELETE RESTRICT
+);
+--adding default password for SUPER ADMIN
+--select your own password before executing script
+INSERT INTO passwords (user_id, password_hash, is_current, created_time)
+    VALUES (1, crypt('standart_password', gen_salt('bf')), TRUE, NOW());
 
 --creating departments
 CREATE TABLE departments (
@@ -108,7 +129,7 @@ INSERT INTO departments (
     team_name, registration_date, registered_by, is_active
 )
 VALUES 
-('Audit agents', NOW(), 1, TRUE),
+('Audit team', NOW(), 1, TRUE),
 ('QC team', NOW(), 1, TRUE),
 ('Management', NOW(), 1, TRUE);
 
@@ -117,40 +138,72 @@ CREATE TABLE roles (
     role_id SERIAL PRIMARY KEY,
     role_name VARCHAR(20),
     created_time TIMESTAMPTZ,
-    valid_to_date, TIMESTAMPTZ,
+    valid_to_date TIMESTAMPTZ,
     is_active BOOLEAN,
     created_by BIGINT,
+    parent_role BIGINT REFERENCES roles(role_id) ON DELETE RESTRICT,
 
     CONSTRAINT fk_creators
         FOREIGN KEY (created_by)
         REFERENCES users (id)
         ON DELETE SET NULL
 );
+
 --Adding base roles
+--Grand roles
 INSERT INTO roles (
-    role_name, created_time, valid_to_date, is_active, created_by
+    role_name, created_time, valid_to_date, is_active, created_by, parent_role
     )
 VALUES 
-('Agent', NOW(), NULL, TRUE, 1),
---Can register outlet and upload audit data
-('Supervisor', NOW(), NULL, TRUE, 1),
---Provides deadlines for audit and can see audit/validation data
-('Audit lead', NOW(), NULL, TRUE, 1),
---Watches audit/validation results and creates auditor teams (with PM approval)
-('QC Specialist', NOW(), NULL, TRUE, 1),
---Watches and approves audit data
-('QC Lead', NOW(), NULL, TRUE, 1),
---Watches and approves verification
-('QC Manager', NOW(), NULL, TRUE, 1),
---Can create QC teams and see audit/validation data
-('Project Manager', NOW(), NULL, TRUE, 1),
---Can manage project teams see audit/validation data, see analytics results
-('Analyst', NOW(), NULL, TRUE, 1),
---Provides analytics based on validation results
-('Owner', NOW(), NULL, TRUE, 1),
---Can manage projects and see the processes
-('GRAND ADMIN', NOW(), NULL, TRUE, 1);
 --Role with maximal access
+('GRAND ADMIN', NOW(), NULL, TRUE, 1, null),
+--Can manage projects and see the processes
+('Owner', NOW(), NULL, TRUE, 1, null);
+
+--_________________________________________________________
+-- Roles under Owner (PM-s & Analysts)
+INSERT INTO roles (
+    role_name, created_time, valid_to_date, is_active, created_by, parent_role
+    )
+VALUES 
+--Provides analytics based on validation results
+('Analyst', NOW(), NULL, TRUE, 1, 2),
+--Can manage project teams see audit/validation data, see analytics results
+('Project Manager', NOW(), NULL, TRUE, 1, 2);
+
+--__________________________________________________________
+-- Operational Managers Roles
+INSERT INTO roles (
+    role_name, created_time, valid_to_date, is_active, created_by, parent_role
+    )
+VALUES 
+('Audit Manager', NOW(), NULL, TRUE, 1, 4),
+--Watches audit/validation results and creates auditor teams (with PM approval)
+('QC Manager', NOW(), NULL, TRUE, 1, 4);
+--Watches and approves verification
+
+--__________________________________________________________
+-- Operational Supervisors` Roles
+INSERT INTO roles (
+    role_name, created_time, valid_to_date, is_active, created_by, parent_role
+    )
+VALUES 
+--Provides deadlines for audit and can see audit/validation data
+('Supervisor', NOW(), NULL, TRUE, 1, 5),
+--Can create QC teams and see audit/validation data
+('QC Lead', NOW(), NULL, TRUE, 1, 6);
+
+--__________________________________________________________
+-- Linear Roles
+INSERT INTO roles (
+    role_name, created_time, valid_to_date, is_active, created_by, parent_role
+    )
+VALUES 
+('Audit Agent', NOW(), NULL, TRUE, 1, 7),
+--Can register outlet and upload audit data
+('QC Specialist', NOW(), NULL, TRUE, 1, 8);
+--Watches and approves audit data
+
 
 --Creating team roaster
 CREATE TABLE team_roaster (
@@ -178,7 +231,7 @@ CREATE TABLE team_roaster (
 
     CONSTRAINT fk_roles
         FOREIGN KEY (agent_role)
-        REFERENCES roles (id)
+        REFERENCES roles (role_id)
         ON DELETE RESTRICT,
 
     CONSTRAINT fk_assigner
@@ -236,17 +289,17 @@ CREATE TABLE d_sku_info (
     brand INTEGER NOT NULL,
 
     CONSTRAINT fk_added_by
-        FOREIGN KEY added_by
+        FOREIGN KEY (added_by)
         REFERENCES users (id)
         ON DELETE RESTRICT,
 
     CONSTRAINT fk_approval
-        FOREIGN KEY approved_by
+        FOREIGN KEY (approved_by)
         REFERENCES users (id)
         ON DELETE RESTRICT,
 
     CONSTRAINT fk_brands
-        FOREIGN KEY brand
+        FOREIGN KEY (brand)
         REFERENCES d_brandnames (id)
         ON DELETE RESTRICT
 );
@@ -327,7 +380,7 @@ CREATE TABLE outlets (
     registered_date TIMESTAMPTZ NOT NULL,
     base_cycle INTEGER NOT NULL,
     city t_cities NOT NULL,
-    outlet_location GEOGRAPHY,
+    outlet_location POINT,
     adress VARCHAR(255) NOT NULL,
     owner_name VARCHAR(255) NOT NULL,
     owner_phone1 VARCHAR(12) NOT NULL, --Uzbekistan
@@ -379,7 +432,7 @@ CREATE TABLE audit_plan (
 
 --Audits/visits done
 CREATE TABLE audit_data (
-    id SERIAL,
+    id SERIAL PRIMARY KEY,
     plan_id BIGINT,
     outlet BIGINT,
     visit_sequence INTEGER NOT NULL,
@@ -389,9 +442,6 @@ CREATE TABLE audit_data (
     next_audit_needed BOOLEAN NOT NULL,
     next_cycle_audit BOOLEAN NOT NULL,
     agent_comment VARCHAR(255),
-
-    CONSTRAINT pk_visits
-        PRIMARY KEY (id, plan_id, outlet),
 
     CONSTRAINT fk_plan
         FOREIGN KEY (plan_id)
@@ -427,7 +477,7 @@ CREATE TABLE raw_data (
 
     CONSTRAINT fk_sku
         FOREIGN KEY (sku_code)
-        REFERENCES d_sku_info (id)
+        REFERENCES d_sku_info (sku_id)
         ON DELETE RESTRICT,
 
     CONSTRAINT fk_scd
@@ -457,7 +507,7 @@ CREATE TABLE qc_tasks (
     task_status t_task_status NOT NULL,
 
     CONSTRAINT fk_audit
-        FOREIGN KEY (audit_it)
+        FOREIGN KEY (audit_id)
         REFERENCES audit_data (id)
         ON DELETE RESTRICT,
 
@@ -471,7 +521,7 @@ CREATE TABLE qc_tasks (
 CREATE TABLE qc_tasks_log (
     id SERIAL PRIMARY KEY,
     task_id BIGINT NOT NULL,
-    modified_by BIGINT NOT NULL.
+    modified_by BIGINT NOT NULL,
     mofified_time TIMESTAMPTZ NOT NULL,
     start_time_new TIMESTAMPTZ NOT NULL,
     end_time_nem TIMESTAMPTZ,

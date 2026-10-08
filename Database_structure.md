@@ -246,11 +246,14 @@ Needed for individual access to reports or instruments
 | Column names    | data type | comment            |
 |-----------------|-----------|--------------------|
 | role_id (PK)    | SERIAL    |
-| role_name       | VARCHAR(20)| Agent / Supervisor / QC Specialist / QC Lead / QC Manager / Project manager / Analyst / ... etc
+| role_name       | VARCHAR(20)| Admin/Owner/Agent / Supervisor / QC Specialist / QC Lead / QC Manager / Project manager / Analyst / ... etc
 | created_time    | TIMESTAMPTZ  |
 | valid_to_date   | TIMESTAMPTZ  |
+| parent_id       | INTEGER      | need for hierarchy of roles
 | is_active       | BOOLEAN   |
 | created_by      | BIGINT    | users.id    
+
+Role hierarchy - needed to define access level for groups. The root role is 1 for Admin (full access) and 3 - Owner (full access except for unsafe features).  
 
 #### users <a id="users"></a>
 | Column names    | data type | comment            |
@@ -259,9 +262,17 @@ Needed for individual access to reports or instruments
 | first_name      | VARCHAR(30)|
 | second_name     | VARCHAR(30)|
 | register_date    | TIMESTAMPTZ  |
-| created_by      | BIGINT    | Users.id
+| created_by      | BIGINT    | users.id
 | gender          | t_gender  |
 
+### passwords <a id="pass_words"></a>
+| Column names    | data type | comment            |
+|-----------------|-----------|--------------------|
+| user_id (FK)    | BIGINT    | users.id
+| password_hash   | VARCHAR(60)|
+| is_current      | BOOLEAN    | 
+| created_date    | TIMESTAMPTZ|
+| changed_date    | TIMESTAMPTZ  |
 
 #### team_roaster <a id="team_roaster"></a>
 | Column names    | data type | comment            |
@@ -272,8 +283,8 @@ Needed for individual access to reports or instruments
 | movement_type   | t_movements| HIRING / LEAVING / TRANSITION
 | department (FK) | BIGINT    | departments.id
 | agent_role (FK) | BIGINT    | roles.id
-| valid_from      | DATE      |
-| valid_to        | DATE      |           
+| valid_from      | DATE      | first day of valid information
+| valid_to        | DATE      | last day of valid information
 | is_current      | BOOLEAN   |
 | assigned_by(FK) | BIGINT    |           | users.id
 | comment         | TEXT      |
@@ -305,8 +316,8 @@ Contains information about SKU`s slow dimensional changes
 | created_time    | TIMESTAMPTZ |
 | added_by        | BIGINT    | users.id
 | approved_by     | BIGINT    | users.id
-| valid_from_cycle| INTEGER   |
-| valid_to_cycle  | INTEGER   |
+| valid_from_cycle| INTEGER   | 
+| valid_to_cycle  | INTEGER   | 
 | sku_code_name   | VARCHAR(100)| include brand, sku name or line, package parameter, volume in grams
 | product_line    | INTEGER   | d_brand_lines.id
 | category        | TYPE      | t_categories
